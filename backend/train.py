@@ -27,6 +27,8 @@ from sklearn.metrics import (
 from data_pipeline import load_and_audit_data, FEATURE_NAMES
 from preprocessing import build_preprocessing_pipeline, prepare_train_test_split
 
+BACKEND_DIR = os.path.dirname(os.path.abspath(__file__))
+
 NORMAL_RANGES = {
     "Glucose": (70, 99),
     "BloodPressure": (60, 80),
@@ -128,26 +130,27 @@ def train_and_evaluate_models() -> Dict[str, Any]:
         "feature_names": FEATURE_NAMES
     }
 
-    # Phase 6: Serialisation
-    os.makedirs("saved_models", exist_ok=True)
-    model_save_path = "saved_models/diabetes_model.sav"
+    # Phase 6: Serialisation — always saves beside this script (backend/)
+    model_save_path = os.path.join(BACKEND_DIR, "diabetes_model.sav")
     with open(model_save_path, "wb") as f:
         pickle.dump(best_pipeline, f)
     print(f"[SERIALISE] Saved trained model pipeline to: {model_save_path}")
 
-    with open("saved_models/feature_names.json", "w") as f:
+    with open(os.path.join(BACKEND_DIR, "feature_names.json"), "w") as f:
         json.dump(FEATURE_NAMES, f, indent=2)
 
-    with open("saved_models/metrics.json", "w") as f:
+    with open(os.path.join(BACKEND_DIR, "metrics.json"), "w") as f:
         json.dump(metrics, f, indent=2)
 
     print("[SERIALISE] Saved feature_names.json and metrics.json successfully.")
     return metrics
 
-def predict_diabetes_proba(patient_data: List[float], model_path: str = "saved_models/diabetes_model.sav") -> float:
+def predict_diabetes_proba(patient_data: List[float], model_path: str = "") -> float:
     """
     Helper function to score a patient feature vector using the serialized model.
     """
+    if not model_path:
+        model_path = os.path.join(BACKEND_DIR, "diabetes_model.sav")
     if not os.path.exists(model_path):
         raise FileNotFoundError(f"Model not found at {model_path}. Please run train.py first.")
     with open(model_path, "rb") as f:

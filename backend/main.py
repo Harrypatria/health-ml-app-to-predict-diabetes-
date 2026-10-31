@@ -20,6 +20,8 @@ from schemas import (
 from train import predict_diabetes_proba, flag_abnormal_features, FEATURE_NAMES
 from agent import explain_diagnosis
 
+BACKEND_DIR = os.path.dirname(os.path.abspath(__file__))
+
 app = FastAPI(
     title="AI Health Copilot Pro API",
     description="Full-stack clinical risk modeling & agentic AI copilot for early Type-2 diabetes detection.",
@@ -39,7 +41,7 @@ ALERT_THRESHOLD = float(os.getenv("ALERT_THRESHOLD", 0.70))
 
 @app.get("/health", response_model=HealthResponse)
 def health_check():
-    model_exists = os.path.exists("saved_models/diabetes_model.sav")
+    model_exists = os.path.exists(os.path.join(BACKEND_DIR, "diabetes_model.sav"))
     return HealthResponse(
         status="ok",
         model_loaded=model_exists,
@@ -48,7 +50,7 @@ def health_check():
 
 @app.get("/model-metrics", response_model=ModelMetricsResponse)
 def get_model_metrics():
-    metrics_path = "saved_models/metrics.json"
+    metrics_path = os.path.join(BACKEND_DIR, "metrics.json")
     if not os.path.exists(metrics_path):
         raise HTTPException(status_code=404, detail="Model metrics not found. Train the model first.")
     with open(metrics_path, "r") as f:

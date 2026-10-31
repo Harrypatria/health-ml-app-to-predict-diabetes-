@@ -22,7 +22,10 @@ FEATURE_NAMES = [
 ]
 TARGET_COLUMN = "Outcome"
 
-def load_and_audit_data(csv_path: str = "dataset/diabetes.csv") -> pd.DataFrame:
+_BACKEND_DIR = os.path.dirname(os.path.abspath(__file__))
+_PROJECT_DIR = os.path.dirname(_BACKEND_DIR)
+
+def load_and_audit_data(csv_path: str = "") -> pd.DataFrame:
     """
     Loads the Pima Indians Diabetes Dataset and executes the clinical audit:
     1. Check shape, columns, and target distribution
@@ -30,12 +33,14 @@ def load_and_audit_data(csv_path: str = "dataset/diabetes.csv") -> pd.DataFrame:
     3. Replace biologically impossible zeros with np.nan
     4. Validate data integrity
     """
+    if not csv_path:
+        csv_path = os.path.join(_PROJECT_DIR, "dataset", "diabetes.csv")
     if not os.path.exists(csv_path):
-        # Fallback search paths
+        # Fallback search paths (absolute, relative to project root)
         alt_paths = [
-            "public/assets/aistudio/diabetes_698c203a.csv",
-            "diabetes.csv",
-            "../dataset/diabetes.csv"
+            os.path.join(_PROJECT_DIR, "public", "assets", "aistudio", "diabetes_698c203a.csv"),
+            os.path.join(_PROJECT_DIR, "diabetes.csv"),
+            os.path.join(_BACKEND_DIR, "diabetes.csv"),
         ]
         found = False
         for alt in alt_paths:
