@@ -1,0 +1,6 @@
+{
+  "name": "AI Health Copilot Pro",
+  "description": "Production-grade clinical risk modeling & agentic AI copilot for early Type-2 diabetes risk detection, deterministic feature flagging, and ITDO care operations.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
